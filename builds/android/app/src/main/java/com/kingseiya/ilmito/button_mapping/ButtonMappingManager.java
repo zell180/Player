@@ -292,7 +292,7 @@ public class ButtonMappingManager {
             l.add(VirtualButton.Create(context, VirtualButton.CANCEL, 0.90, 0.6, 100));
             l.add(VirtualButton.Create(context, VirtualButton.SHIFT, 0.80, 0.45, 100));
             l.add(new MenuButton(context, 0, 0, 90));
-            l.add(new FastForwardingButton(context, VirtualButton.KEY_FAST_FORWARD 0.90, 0, 90));
+            l.add(new FastForwardingButton(context, VirtualButton.KEY_FAST_FORWARD, 0.90, 0, 90));
 
             return l;
         }
