@@ -109,3 +109,6 @@ __MACOSX
 
 # libretro
 easyrpg_libretro.*
+
+# Game folder
+/builds/android/app/src/main/assets/

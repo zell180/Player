@@ -9,7 +9,7 @@ LOCAL_MODULE := gamebrowser
 LOCAL_C_INCLUDES :=
 
 LOCAL_SRC_FILES := \
-	org_easyrpg_player_game_browser_GameScanner.cpp
+	com_kingseiya_ilmito_game_browser_GameScanner.cpp
 
 LOCAL_LDLIBS := -llog -lz -latomic
 

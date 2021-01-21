@@ -14,7 +14,7 @@ LOCAL_C_INCLUDES := \
 
 # Add your application source files here...
 LOCAL_SRC_FILES := \
-	org_easyrpg_player_player_EasyRpgPlayerActivity.cpp \
+	com_kingseiya_ilmito_player_EasyRpgPlayerActivity.cpp \
 	$(patsubst $(LOCAL_PATH)/%, %, $(wildcard $(LOCAL_PATH)/$(PLAYER_PATH)/src/*.cpp))
 
 LOCAL_SHARED_LIBRARIES := SDL2 hidapi

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!--GameBrowser Activity-->
-    <string name="app_name" translate="false">EasyRPG Player</string>
+    <string name="app_name" translate="false">Saint Seiya -Il Mito-</string>
     <string name="autodetect">Autodetect Region (Recommended)</string>
     <string name="west_europe">Western European</string>
     <string name="east_europe">Central/Eastern European</string>
@@ -35,7 +35,7 @@ You can add additional game directories in the settings.</string>
     <string name="region_modification_failed">Changing region failed</string>
     <string name="refresh">Refresh</string>
     <string name="change_default_mapping">Change the default button mapping</string>
-    <string name="how_to_use_easy_rpg">How to use EasyRPG Player</string>
+    <string name="how_to_use_easy_rpg">How to use Saint Seiya -Il Mito-</string>
     <string name="how_to_use_easy_rpg_explanation">Installation instructions:\n\nBy default games are searched in /easyrpg/games. You can add additional game directories in the settings.\n\nOptional: Place the RTP in /easyrpg/rtp/2000 for the RPG Maker 2000 RTP and in /easyrpg/rtp/2003 for the RPG Maker 2003 RTP.\n\nTo get games properly detected they must be put in a subdirectory of /easyrpg/games (by default), e.g.:\n\n\t/easyrpg/games/MyGame/Data/RPG_RT.ldb is OK.\n\t/easyrpg/games/MyGame/RPG_RT.ldb is OK.\n\t/easyrpg/games/MyGame.zip is WRONG. ZIP and EXE are unsupported.</string>
 
     <!--Ingame menu-->
@@ -44,7 +44,7 @@ You can add additional game directories in the settings.</string>
     <string name="end_game">End game</string>
     <string name="report_bug">Report a bug</string>
     <string name="report_bug_msg">This function will open your E-mail program (e.g. Gmail) to send us the bug report.\n\nIf you don\'t want to send a mail or don\'t have a mail program configured you can open a new issue at https://github.com/EasyRPG/Player/issues instead.</string>
-    <string name="report_bug_mail">Thank you for supporting EasyRPG Player.\n
+    <string name="report_bug_mail">Thank you for supporting Saint Seiya -Il Mito-.\n
 A logfile and your savegames were attached to this E-Mail.\n
 Please don\'t remove the logfile! We need a savegame that is close to the bug location.\n
 Please tell us in detail what went wrong.\n\n

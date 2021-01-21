@@ -4,7 +4,7 @@
               android:layout_height="match_parent"
               android:orientation="vertical"
               android:padding="10dp"
-              tools:context="org.easyrpg.player.settings.SettingsVideoActivity">
+              tools:context="com.kingseiya.ilmito.settings.SettingsVideoActivity">
 
     <CheckBox
         android:id="@+id/force_landscape_mode"

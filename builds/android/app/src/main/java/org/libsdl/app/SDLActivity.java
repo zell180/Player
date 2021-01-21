@@ -8,7 +8,7 @@ import java.lang.reflect.Method;
 import java.lang.Math;
 
 // EasyRPG additions
-import org.easyrpg.player.R;
+import com.kingseiya.ilmito.R;
 import android.widget.AbsoluteLayout;
 
 import android.app.*;
