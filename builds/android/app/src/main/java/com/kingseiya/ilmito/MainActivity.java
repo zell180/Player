@@ -76,8 +76,8 @@ public class MainActivity extends Activity {
             if (!(new File(dataDir + "/game").exists())) {
                 AssetUtils.copyFolder(assetManager, "game", dataDir + "/game");
                 setAppVersion();
-            } else if (new File(dataDir + "/timidity").exists() &&
-                    (getPackageManager().getPackageInfo(getPackageName(), 0).versionName != getAppVersion())){
+            } else if (new File(dataDir + "/game").exists() &&
+                    !getPackageManager().getPackageInfo(getPackageName(), 0).versionName.equals(getAppVersion())){
                 AssetUtils.copyFolder(assetManager, "game", dataDir + "/game");
                 setAppVersion();
             }
@@ -91,8 +91,8 @@ public class MainActivity extends Activity {
             // Unzip game to internal memory
             if (!(new File(dataDir + "/game").exists())) {
                 AssetUtils.unzipFile(assetManager, "game.zip", dataDir + "/game");
-            } else if (new File(dataDir + "/timidity").exists() &&
-                    (getPackageManager().getPackageInfo(getPackageName(), 0).versionName != getAppVersion())){
+            } else if (new File(dataDir + "/game").exists() &&
+                    !getPackageManager().getPackageInfo(getPackageName(), 0).versionName.equals(getAppVersion())){
                 AssetUtils.unzipFile(assetManager, "game.zip", dataDir + "/game");
                 setAppVersion();
             }
@@ -125,12 +125,13 @@ public class MainActivity extends Activity {
     private void setAppVersion() throws PackageManager.NameNotFoundException {
         SharedPreferences settings = getApplicationContext().getSharedPreferences("sharedPref", 0);
         SharedPreferences.Editor editor = settings.edit();
+        String test = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
         editor.putString("appVersion", getPackageManager().getPackageInfo(getPackageName(), 0).versionName);
         editor.apply();
     }
 
     private String getAppVersion() {
         SharedPreferences settings = getApplicationContext().getSharedPreferences("sharedPref", 0);
-        return settings.getString("appVersion", "1.0.0");
+        return settings.getString("appVersion", "missing");
     }
 }
