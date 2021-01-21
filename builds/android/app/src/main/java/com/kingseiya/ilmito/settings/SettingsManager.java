@@ -57,7 +57,7 @@ public class SettingsManager {
     private static void loadSettings() {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
 
-        vibrationEnabled = sharedPref.getBoolean(VIBRATION_ENABLED.toString(), true);
+        vibrationEnabled = sharedPref.getBoolean(VIBRATION_ENABLED.toString(), false);
         audioEnabled = sharedPref.getBoolean(AUDIO_ENABLED.toString(), true);
         layoutTransparency = sharedPref.getInt(LAYOUT_TRANSPARENCY.toString(), 100);
         vibrateWhenSlidingDirectionEnabled = sharedPref.getBoolean(VIBRATE_WHEN_SLIDING_DIRECTION.toString(), false);
