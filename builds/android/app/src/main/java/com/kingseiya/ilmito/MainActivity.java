@@ -2,6 +2,8 @@ package com.kingseiya.ilmito;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.util.Log;
@@ -29,7 +31,11 @@ public class MainActivity extends Activity {
         prepareData();
 
         // if the app is called in a game folder : start the game
-        startGameStandalone();
+        try {
+            startGameStandalone();
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
 
         // else : launch the gamebrowser activity
         if (!standaloneMode) {
@@ -56,7 +62,7 @@ public class MainActivity extends Activity {
      * Standalone Mode-> if there is a game folder in assets: that folder is
      * copied to internal memory and executed.
      */
-    private void startGameStandalone() {
+    private void startGameStandalone() throws PackageManager.NameNotFoundException {
         AssetManager assetManager = getAssets();
         String dataDir = getApplication().getApplicationInfo().dataDir;
 
@@ -69,6 +75,11 @@ public class MainActivity extends Activity {
             // Copy game in internal memory
             if (!(new File(dataDir + "/game").exists())) {
                 AssetUtils.copyFolder(assetManager, "game", dataDir + "/game");
+                setAppVersion();
+            } else if (new File(dataDir + "/timidity").exists() &&
+                    (getPackageManager().getPackageInfo(getPackageName(), 0).versionName != getAppVersion())){
+                AssetUtils.copyFolder(assetManager, "game", dataDir + "/game");
+                setAppVersion();
             }
         }
 
@@ -80,6 +91,10 @@ public class MainActivity extends Activity {
             // Unzip game to internal memory
             if (!(new File(dataDir + "/game").exists())) {
                 AssetUtils.unzipFile(assetManager, "game.zip", dataDir + "/game");
+            } else if (new File(dataDir + "/timidity").exists() &&
+                    (getPackageManager().getPackageInfo(getPackageName(), 0).versionName != getAppVersion())){
+                AssetUtils.unzipFile(assetManager, "game.zip", dataDir + "/game");
+                setAppVersion();
             }
         }
 
@@ -105,5 +120,17 @@ public class MainActivity extends Activity {
         Intent intent;
         intent = new Intent(this, GameBrowserActivity.class);
         startActivity(intent);
+    }
+
+    private void setAppVersion() throws PackageManager.NameNotFoundException {
+        SharedPreferences settings = getApplicationContext().getSharedPreferences("sharedPref", 0);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putString("appVersion", getPackageManager().getPackageInfo(getPackageName(), 0).versionName);
+        editor.apply();
+    }
+
+    private String getAppVersion() {
+        SharedPreferences settings = getApplicationContext().getSharedPreferences("sharedPref", 0);
+        return settings.getString("appVersion", "1.0.0");
     }
 }

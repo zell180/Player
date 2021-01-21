@@ -71,7 +71,7 @@ public class AssetUtils {
 					String targetFile = folder.getAbsolutePath() + "/" + filename;
 					try {
 						in = assetManager.open(sourceFile);
-						out = new FileOutputStream(targetFile);
+						out = new FileOutputStream(targetFile, false);
 						/*Log.i("WEBVIEW",
 								Environment.getExternalStorageDirectory()
 										+ "/yourTargetFolder/" + name + "/"
@@ -130,7 +130,7 @@ public class AssetUtils {
 						continue;
 					}
 
-					FileOutputStream fout = new FileOutputStream(target + "/" + filename);
+					FileOutputStream fout = new FileOutputStream(target + "/" + filename, false);
 					copyFile(zis, fout);
 					fout.flush();
 					fout.close();
