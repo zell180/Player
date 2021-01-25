@@ -15,6 +15,7 @@ import com.kingseiya.ilmito.player.AssetUtils;
 import com.kingseiya.ilmito.settings.SettingsManager;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * The activity called at launch.
@@ -23,17 +24,19 @@ import java.io.File;
  * ("game" is the project directory, no sub folder)
  */
 public class MainActivity extends Activity {
-    private boolean standaloneMode = false;
+    private boolean standaloneMode = true;
+    private int mainVersion = 120;
+    private int patchVersion = 120;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        prepareData();
+        //prepareData();
 
         // if the app is called in a game folder : start the game
         try {
-            startGameStandalone();
-        } catch (PackageManager.NameNotFoundException e) {
+            startGameStandaloneWithExpansion();
+        } catch (PackageManager.NameNotFoundException | IOException e) {
             e.printStackTrace();
         }
 
@@ -62,7 +65,47 @@ public class MainActivity extends Activity {
      * Standalone Mode-> if there is a game folder in assets: that folder is
      * copied to internal memory and executed.
      */
-    private void startGameStandalone() throws PackageManager.NameNotFoundException {
+    private void startGameStandaloneWithExpansion() throws PackageManager.NameNotFoundException, IOException {
+        String dataDir = getApplication().getApplicationInfo().dataDir;
+
+        // Standalone mode: Copy game in game folder to data folder and launch
+        // it
+        Log.i("EasyRPG", "Standalone mode : a \"game\" folder is present in asset folder");
+        standaloneMode = true;
+
+        // Copy game in internal memory
+        if (!(new File(dataDir + "/game").exists())) {
+            AssetUtils.copyFolderFromExpansion(getApplicationContext(), dataDir + "/",
+                    mainVersion, patchVersion, false);
+            setMainVersion();
+            setPatchVersion();
+        } else {
+            if (mainVersion > getMainVersion()) {
+                AssetUtils.copyFolderFromExpansion(getApplicationContext(), dataDir + "/",
+                        mainVersion, patchVersion, false);
+                setMainVersion();
+                setPatchVersion();
+            }
+            if (patchVersion > getPatchVersion()) {
+                AssetUtils.copyFolderFromExpansion(getApplicationContext(), dataDir + "/",
+                        mainVersion, patchVersion, true);
+                setPatchVersion();
+            }
+        }
+
+        if (standaloneMode) {
+            // Launch the game
+            GameInformation project = new GameInformation(dataDir + "/game");
+            GameBrowserHelper.launchGame(this, project);
+            finish();
+        }
+    }
+
+    /**
+     * Standalone Mode-> if there is a game folder in assets: that folder is
+     * copied to internal memory and executed.
+     */
+    private void startGameStandalone() {
         AssetManager assetManager = getAssets();
         String dataDir = getApplication().getApplicationInfo().dataDir;
 
@@ -75,11 +118,6 @@ public class MainActivity extends Activity {
             // Copy game in internal memory
             if (!(new File(dataDir + "/game").exists())) {
                 AssetUtils.copyFolder(assetManager, "game", dataDir + "/game");
-                setAppVersion();
-            } else if (new File(dataDir + "/game").exists() &&
-                    !getPackageManager().getPackageInfo(getPackageName(), 0).versionName.equals(getAppVersion())){
-                AssetUtils.copyFolder(assetManager, "game", dataDir + "/game");
-                setAppVersion();
             }
         }
 
@@ -91,10 +129,6 @@ public class MainActivity extends Activity {
             // Unzip game to internal memory
             if (!(new File(dataDir + "/game").exists())) {
                 AssetUtils.unzipFile(assetManager, "game.zip", dataDir + "/game");
-            } else if (new File(dataDir + "/game").exists() &&
-                    !getPackageManager().getPackageInfo(getPackageName(), 0).versionName.equals(getAppVersion())){
-                AssetUtils.unzipFile(assetManager, "game.zip", dataDir + "/game");
-                setAppVersion();
             }
         }
 
@@ -122,16 +156,27 @@ public class MainActivity extends Activity {
         startActivity(intent);
     }
 
-    private void setAppVersion() throws PackageManager.NameNotFoundException {
+    private void setMainVersion() throws PackageManager.NameNotFoundException {
         SharedPreferences settings = getApplicationContext().getSharedPreferences("sharedPref", 0);
         SharedPreferences.Editor editor = settings.edit();
-        String test = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
-        editor.putString("appVersion", getPackageManager().getPackageInfo(getPackageName(), 0).versionName);
+        editor.putInt("mainVersion", mainVersion);
         editor.apply();
     }
 
-    private String getAppVersion() {
+    private int getMainVersion() {
         SharedPreferences settings = getApplicationContext().getSharedPreferences("sharedPref", 0);
-        return settings.getString("appVersion", "missing");
+        return settings.getInt("mainVersion", 100);
+    }
+
+    private void setPatchVersion() throws PackageManager.NameNotFoundException {
+        SharedPreferences settings = getApplicationContext().getSharedPreferences("sharedPref", 0);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putInt("patchVersion", mainVersion);
+        editor.apply();
+    }
+
+    private int getPatchVersion() {
+        SharedPreferences settings = getApplicationContext().getSharedPreferences("sharedPref", 0);
+        return settings.getInt("patchVersion", 100);
     }
 }

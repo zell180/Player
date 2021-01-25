@@ -34,9 +34,13 @@ import java.util.zip.ZipEntry;
 import java.io.BufferedInputStream;
 import java.util.Arrays;
 
+import android.content.Context;
 import android.content.res.AssetManager;
 import android.os.Environment;
 import android.util.Log;
+
+import com.android.vending.expansion.zipfile.APKExpansionSupport;
+import com.android.vending.expansion.zipfile.ZipResourceFile;
 
 // based on https://stackoverflow.com/q/15574983/
 
@@ -145,6 +149,79 @@ public class AssetUtils {
 				Log.e("ERROR", "Failed to get asset zipfile.", e);
 			}
 
+		} else if (Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
+			// We can only read the media
+		} else {
+			// Something else is wrong. It may be one of many other states, but
+			// all we need
+			// is to know is we can neither read nor write
+		}
+	}
+
+	public static void copyFolderFromExpansion(Context appContext, String target,
+											   int mainVersion,
+											   int patchVersion,
+											   boolean update) throws IOException {
+		// "Name" is the name of your folder!
+		String[] files = null;
+		String state = Environment.getExternalStorageState();
+		ZipResourceFile expansionFile = null;
+		if (!update) {
+			expansionFile =	APKExpansionSupport.getAPKExpansionZipFile(appContext, mainVersion, patchVersion);
+		} else {
+			expansionFile = new ZipResourceFile(Environment.getExternalStorageDirectory().getAbsolutePath() +
+															"/Android/obb/" +
+															appContext.getPackageName() +
+															"/patch." +
+															patchVersion +
+															"." + appContext.getPackageName() +
+															".obb");
+		}
+
+		ZipResourceFile.ZipEntryRO[] zipFiles = expansionFile.getAllEntries();
+
+		if (Environment.MEDIA_MOUNTED.equals(state)) {
+			// We can read and write the media
+
+			// Analyzing all file on assets subfolder
+			for (ZipResourceFile.ZipEntryRO file: zipFiles) {
+				String pathInsideZip = file.mFileName;
+				String fileName = file.mFileName.substring(pathInsideZip.lastIndexOf("/"));
+				if (!fileName.equals("/")) {
+					String filePath = pathInsideZip.replace(fileName,"");
+					InputStream in = null;
+					OutputStream out = null;
+					// First: checking if there is already a target folder
+					File folder = new File(target + filePath);
+					boolean success = true;
+					if (!folder.exists()) {
+						success = folder.mkdirs();
+					}
+					if (success) {
+						// Moving all the files on external SD
+						//String sourceFile = source + "/" + filename;
+						String targetFile = folder.getAbsolutePath() + fileName;
+						try {
+							in = expansionFile.getInputStream(pathInsideZip);
+							out = new FileOutputStream(targetFile, false);
+						/*Log.i("WEBVIEW",
+								Environment.getExternalStorageDirectory()
+										+ "/yourTargetFolder/" + name + "/"
+										+ filename);*/
+							copyFile(in, out);
+							in.close();
+							in = null;
+							out.flush();
+							out.close();
+							out = null;
+						} catch (IOException e) {
+							Log.e("ERROR","Failed to copy asset file: " + targetFile, e);
+						}
+					} else {
+						// Do something else on failure
+					}
+				}
+			}
 		} else if (Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
 			// We can only read the media
 		} else {
