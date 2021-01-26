@@ -66,6 +66,7 @@ public class MainActivity extends Activity {
      * copied to internal memory and executed.
      */
     private void startGameStandaloneWithExpansion() throws PackageManager.NameNotFoundException, IOException {
+        AssetUtils.askForStoragePermission(this);
         String dataDir = getApplication().getApplicationInfo().dataDir;
 
         // Standalone mode: Copy game in game folder to data folder and launch
@@ -79,6 +80,7 @@ public class MainActivity extends Activity {
                     mainVersion, patchVersion, false);
             setMainVersion();
             setPatchVersion();
+            AssetUtils.copySaveFromExternal(getApplicationContext(), dataDir + "/game");
         } else {
             if (mainVersion > getMainVersion()) {
                 AssetUtils.copyFolderFromExpansion(getApplicationContext(), dataDir + "/",

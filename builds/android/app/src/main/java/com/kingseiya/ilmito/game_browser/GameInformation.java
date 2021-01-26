@@ -26,7 +26,8 @@ public class GameInformation implements Comparable<GameInformation> {
 
 		// SavePath
 		if (GameBrowserHelper.canWrite(f)) {
-			this.savePath = gameFolderPath;
+			this.savePath = gameFolderPath + "/Save";
+			new File(savePath).mkdirs();
 		} else {
 			// Not writable, redirect to a different path
 			// Try preventing collisions by using the names of the two parent directories
