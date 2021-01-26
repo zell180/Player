@@ -1,5 +1,7 @@
 package com.kingseiya.ilmito.game_browser;
 
+import android.content.Context;
+import android.os.Environment;
 import android.util.Log;
 
 import com.kingseiya.ilmito.Helper;
@@ -26,12 +28,34 @@ public class GameInformation implements Comparable<GameInformation> {
 
 		// SavePath
 		if (GameBrowserHelper.canWrite(f)) {
-			this.savePath = gameFolderPath + "/Save";
-			new File(savePath).mkdirs();
+			this.savePath = gameFolderPath;
 		} else {
 			// Not writable, redirect to a different path
 			// Try preventing collisions by using the names of the two parent directories
 			String savename = f.getParentFile().getName() + "/" + f.getName();  
+			savePath = SettingsManager.getEasyRPGFolder() + "/Save/" + savename;
+			new File(savePath).mkdirs();
+		}
+
+		// isFavorite
+		this.isFavorite = isFavoriteFromSettings();
+	}
+
+	//Specific constructor to create external save_path in standalone mode
+	public GameInformation(Context appContext, String gameFolderPath) {
+		this.gameFolderPath = gameFolderPath;
+		File f = new File(gameFolderPath);
+
+		// SavePath
+		if (GameBrowserHelper.canWrite(f)) {
+			this.savePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" +
+					appContext.getPackageName().substring(appContext.getPackageName().lastIndexOf("."))
+							.replace(".","");
+			new File(savePath).mkdirs();
+		} else {
+			// Not writable, redirect to a different path
+			// Try preventing collisions by using the names of the two parent directories
+			String savename = f.getParentFile().getName() + "/" + f.getName();
 			savePath = SettingsManager.getEasyRPGFolder() + "/Save/" + savename;
 			new File(savePath).mkdirs();
 		}

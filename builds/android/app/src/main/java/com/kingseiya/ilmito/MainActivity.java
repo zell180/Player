@@ -6,7 +6,10 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.os.Bundle;
+import android.os.FileObserver;
 import android.util.Log;
+
+import androidx.annotation.Nullable;
 
 import com.kingseiya.ilmito.game_browser.GameBrowserActivity;
 import com.kingseiya.ilmito.game_browser.GameBrowserHelper;
@@ -80,7 +83,6 @@ public class MainActivity extends Activity {
                     mainVersion, patchVersion, false);
             setMainVersion();
             setPatchVersion();
-            AssetUtils.copySaveFromExternal(getApplicationContext(), dataDir + "/game");
         } else {
             if (mainVersion > getMainVersion()) {
                 AssetUtils.copyFolderFromExpansion(getApplicationContext(), dataDir + "/",
@@ -97,7 +99,7 @@ public class MainActivity extends Activity {
 
         if (standaloneMode) {
             // Launch the game
-            GameInformation project = new GameInformation(dataDir + "/game");
+            GameInformation project = new GameInformation(getApplicationContext(), dataDir + "/game");
             GameBrowserHelper.launchGame(this, project);
             finish();
         }

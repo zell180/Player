@@ -213,14 +213,13 @@ public class AssetUtils {
 							in = expansionFile.getInputStream(pathInsideZip);
 							out = new FileOutputStream(targetFile, false);
 							copyFile(in, out);
-						} catch (IOException e) {
-							Log.e("ERROR","Failed to copy asset file: " + targetFile, e);
-						} finally {
 							in.close();
 							in = null;
 							out.flush();
 							out.close();
 							out = null;
+						} catch (IOException e) {
+							Log.e("ERROR","Failed to copy asset file: " + targetFile, e);
 						}
 					} else {
 						// Do something else on failure
@@ -236,6 +235,7 @@ public class AssetUtils {
 		}
 	}
 
+	//Not necessary if modify save_path value in GameInformation
 	public static void copySaveFromExternal(Context appContext, String target) throws IOException {
 		String source = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" +
 						appContext.getPackageName().substring(appContext.getPackageName().lastIndexOf("."))
@@ -259,14 +259,13 @@ public class AssetUtils {
 								in = new FileInputStream(sourceFile);
 								out = new FileOutputStream(targetFile, false);
 								copyFile(in, out);
-							} catch (IOException e) {
-								Log.e("ERROR","Failed to copy save file: " + targetFile, e);
-							} finally {
 								in.close();
 								in = null;
 								out.flush();
 								out.close();
 								out = null;
+							} catch (IOException e) {
+								Log.e("ERROR","Failed to copy save file: " + targetFile, e);
 							}
 						}
 					}
