@@ -6,6 +6,11 @@ import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.animation.Animation;
+import android.view.animation.LinearInterpolator;
+import android.view.animation.RotateAnimation;
+import android.widget.ImageView;
+
 import androidx.appcompat.app.AppCompatActivity;
 import com.kingseiya.ilmito.player.AssetUtils;
 import java.io.File;
@@ -20,6 +25,15 @@ public class SplashActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.splashscreen_activity);
+        RotateAnimation rotate = new RotateAnimation(0, 360, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+        rotate.setDuration(10000);
+        rotate.setRepeatCount(Animation.INFINITE);
+        rotate.setRepeatMode(Animation.RESTART);
+        rotate.setInterpolator(new LinearInterpolator());
+
+        ImageView image= (ImageView) findViewById(R.id.iv_icons);
+
+        image.startAnimation(rotate);
         startResourceCopyProcess();
     }
 
