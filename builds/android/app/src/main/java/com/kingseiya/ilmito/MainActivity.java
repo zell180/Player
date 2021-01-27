@@ -6,10 +6,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.os.Bundle;
-import android.os.FileObserver;
 import android.util.Log;
-
-import androidx.annotation.Nullable;
 
 import com.kingseiya.ilmito.game_browser.GameBrowserActivity;
 import com.kingseiya.ilmito.game_browser.GameBrowserHelper;
@@ -27,9 +24,9 @@ import java.io.IOException;
  * ("game" is the project directory, no sub folder)
  */
 public class MainActivity extends Activity {
-    private boolean standaloneMode = true;
-    private int mainVersion = 120;
-    private int patchVersion = 120;
+    private boolean standaloneMode = Versioner.getInstance().isStandaloneMode();
+    private int mainVersion = Versioner.getInstance().getMainVersion();
+    private int patchVersion = Versioner.getInstance().getPatchVersion();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,33 +66,7 @@ public class MainActivity extends Activity {
      * copied to internal memory and executed.
      */
     private void startGameStandaloneWithExpansion() throws PackageManager.NameNotFoundException, IOException {
-        AssetUtils.askForStoragePermission(this);
         String dataDir = getApplication().getApplicationInfo().dataDir;
-
-        // Standalone mode: Copy game in game folder to data folder and launch
-        // it
-        Log.i("EasyRPG", "Standalone mode : a \"game\" folder is present in asset folder");
-        standaloneMode = true;
-
-        // Copy game in internal memory
-        if (!(new File(dataDir + "/game").exists())) {
-            AssetUtils.copyFolderFromExpansion(getApplicationContext(), dataDir + "/",
-                    mainVersion, patchVersion, false);
-            setMainVersion();
-            setPatchVersion();
-        } else {
-            if (mainVersion > getMainVersion()) {
-                AssetUtils.copyFolderFromExpansion(getApplicationContext(), dataDir + "/",
-                        mainVersion, patchVersion, false);
-                setMainVersion();
-                setPatchVersion();
-            }
-            if (patchVersion > getPatchVersion()) {
-                AssetUtils.copyFolderFromExpansion(getApplicationContext(), dataDir + "/",
-                        mainVersion, patchVersion, true);
-                setPatchVersion();
-            }
-        }
 
         if (standaloneMode) {
             // Launch the game
@@ -160,27 +131,4 @@ public class MainActivity extends Activity {
         startActivity(intent);
     }
 
-    private void setMainVersion() throws PackageManager.NameNotFoundException {
-        SharedPreferences settings = getApplicationContext().getSharedPreferences("sharedPref", 0);
-        SharedPreferences.Editor editor = settings.edit();
-        editor.putInt("mainVersion", mainVersion);
-        editor.apply();
-    }
-
-    private int getMainVersion() {
-        SharedPreferences settings = getApplicationContext().getSharedPreferences("sharedPref", 0);
-        return settings.getInt("mainVersion", 100);
-    }
-
-    private void setPatchVersion() throws PackageManager.NameNotFoundException {
-        SharedPreferences settings = getApplicationContext().getSharedPreferences("sharedPref", 0);
-        SharedPreferences.Editor editor = settings.edit();
-        editor.putInt("patchVersion", mainVersion);
-        editor.apply();
-    }
-
-    private int getPatchVersion() {
-        SharedPreferences settings = getApplicationContext().getSharedPreferences("sharedPref", 0);
-        return settings.getInt("patchVersion", 100);
-    }
 }

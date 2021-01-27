@@ -20,16 +20,21 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
 
+        <!-- Splash Activity -->
+        <activity android:name=".SplashActivity"
+            android:theme="@style/AppTheme.NoActionBar.FullScreen">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
         <!-- Startup Activity -->
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
             android:noHistory="true"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
         </activity>
 
         <!-- GameBrowsers' Activity -->
@@ -98,5 +103,9 @@
             android:configChanges="orientation"
             android:label="@string/app_name"
             android:screenOrientation="landscape"/>
+
+        <meta-data
+            android:name="preloaded_fonts"
+            android:resource="@array/preloaded_fonts" />
     </application>
 </manifest>
