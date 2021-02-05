@@ -70,7 +70,7 @@ public class MainActivity extends Activity {
 
         if (standaloneMode) {
             // Launch the game
-            GameInformation project = new GameInformation(getApplicationContext(), dataDir + "/game");
+            GameInformation project = new GameInformation(getApplicationContext(),dataDir + "/game");
             GameBrowserHelper.launchGame(this, project);
             finish();
         }

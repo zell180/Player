@@ -184,9 +184,9 @@ public class VirtualButton extends View {
         char charButton;
 
         if (keyCode == ENTER) {
-            charButton = 'A';
+            charButton = 'I';
         } else if (keyCode == CANCEL) {
-            charButton = 'B';
+            charButton = 'E';
         } else if (keyCode == SHIFT) {
             charButton = 'S';
         } else if (keyCode == KEY_0) {

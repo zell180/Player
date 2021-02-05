@@ -10,7 +10,6 @@ import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
-
 import androidx.appcompat.app.AppCompatActivity;
 import com.kingseiya.ilmito.player.AssetUtils;
 import java.io.File;
@@ -58,6 +57,8 @@ public class SplashActivity extends AppCompatActivity {
                     AssetUtils.copyFolderFromExpansion(getApplicationContext(), dataDir + "/",
                             mainVersion, patchVersion, false);
                     setMainVersion();
+                    AssetUtils.copyFolderFromExpansion(getApplicationContext(), dataDir + "/",
+                            mainVersion, patchVersion, true);
                     setPatchVersion();
                 } catch (IOException | PackageManager.NameNotFoundException e) {
                     e.printStackTrace();
@@ -67,6 +68,8 @@ public class SplashActivity extends AppCompatActivity {
                     try {
                         AssetUtils.copyFolderFromExpansion(getApplicationContext(), dataDir + "/",
                                 mainVersion, patchVersion, false);
+                        AssetUtils.copyFolderFromExpansion(getApplicationContext(), dataDir + "/",
+                                mainVersion, patchVersion, true);
                         setMainVersion();
                         setPatchVersion();
                     } catch (IOException | PackageManager.NameNotFoundException e) {
@@ -108,20 +111,20 @@ public class SplashActivity extends AppCompatActivity {
 
         private int getMainVersion() {
             SharedPreferences settings = getApplicationContext().getSharedPreferences("sharedPref", 0);
-            return settings.getInt("mainVersion", 100);
+            return settings.getInt("mainVersion", 000);
         }
 
         private void setPatchVersion() throws PackageManager.NameNotFoundException {
             SharedPreferences settings = getApplicationContext().getSharedPreferences("sharedPref", 0);
             SharedPreferences.Editor editor = settings.edit();
-            editor.putInt("patchVersion", mainVersion);
+            editor.putInt("patchVersion", patchVersion);
             editor.apply();
         }
 
         private int getPatchVersion() {
             SharedPreferences settings = getApplicationContext().getSharedPreferences("sharedPref", 0);
-            return settings.getInt("patchVersion", 100);
+            return settings.getInt("patchVersion", 000);
         }
     }
-
+    
 }

@@ -175,7 +175,13 @@ public class AssetUtils {
 		String state = Environment.getExternalStorageState();
 		ZipResourceFile expansionFile = null;
 		if (!update) {
-			expansionFile =	APKExpansionSupport.getAPKExpansionZipFile(appContext, mainVersion, patchVersion);
+			expansionFile = new ZipResourceFile(Environment.getExternalStorageDirectory().getAbsolutePath() +
+															"/Android/obb/" +
+															appContext.getPackageName() +
+															"/main." +
+															mainVersion +
+															"." + appContext.getPackageName() +
+															".obb");
 		} else {
 			expansionFile = new ZipResourceFile(Environment.getExternalStorageDirectory().getAbsolutePath() +
 															"/Android/obb/" +
@@ -317,6 +323,10 @@ public class AssetUtils {
 				!= PackageManager.PERMISSION_GRANTED) {
 			ActivityCompat.requestPermissions(context,
 					new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PackageManager.PERMISSION_GRANTED);
+			int check = -1;
+			while (check != 0) {
+				check = ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE);;
+			}
 		}
 	}
 }
