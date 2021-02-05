@@ -1,3 +1,5 @@
 include ':app'
 
 include ':zip_file'
+include ':downloader_library'
+include ':licensing_library'
