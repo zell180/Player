@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="@drawable/ic_splash_background"
+    android:background="@color/design_default_color_on_secondary"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.kingseiya.ilmito.SplashActivity">
@@ -25,10 +25,11 @@
         android:textColor="@color/design_default_color_on_primary"
         android:textSize="28sp"
         android:textStyle="bold"
-        app:fontFamily="@font/vt323" />
+        app:fontFamily="@font/vt323"
+        android:visibility="invisible"/>
 
 
-    <ImageView
+    <!--ImageView
         android:id="@+id/iv_icons"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -45,7 +46,16 @@
         android:adjustViewBounds="true"
         android:background="@android:color/transparent"
         android:scaleType="fitCenter"
-        app:srcCompat="@drawable/ic_splash_ring" />
+        app:srcCompat="@drawable/ic_splash_ring" /-->
+
+    <ImageView
+        android:id="@+id/iv_icons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:adjustViewBounds="true"
+        android:scaleType="centerCrop"
+        tools:srcCompat="@drawable/ic_splash_bkg1" />
 
 
     <TextView
@@ -59,6 +69,7 @@
         android:textColor="@android:color/primary_text_dark"
         android:textSize="28sp"
         android:textStyle="bold"
-        app:fontFamily="@font/vt323" />
+        app:fontFamily="@font/vt323"
+        android:visibility="invisible"/>
 
 </RelativeLayout>

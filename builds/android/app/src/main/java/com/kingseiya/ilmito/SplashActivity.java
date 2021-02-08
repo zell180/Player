@@ -3,6 +3,7 @@ package com.kingseiya.ilmito;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.AnimationDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,20 +21,38 @@ public class SplashActivity extends AppCompatActivity {
     private int mainVersion = Versioner.getInstance().getMainVersion();
     private int patchVersion = Versioner.getInstance().getPatchVersion();
 
+    private ImageView container;
+    private AnimationDrawable animationDrawable;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.splashscreen_activity);
-        RotateAnimation rotate = new RotateAnimation(0, 360, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-        rotate.setDuration(10000);
-        rotate.setRepeatCount(Animation.INFINITE);
-        rotate.setRepeatMode(Animation.RESTART);
-        rotate.setInterpolator(new LinearInterpolator());
+        setContentView(R.layout.splash_animated_activity);
 
-        ImageView image= (ImageView) findViewById(R.id.iv_icons);
+        // Saint Rotation
+        //setContentView(R.layout.splashscreen_activity);
+        //RotateAnimation rotate = new RotateAnimation(0, 360, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+        //rotate.setDuration(10000);
+        //rotate.setRepeatCount(Animation.INFINITE);
+        //rotate.setRepeatMode(Animation.RESTART);
+        //rotate.setInterpolator(new LinearInterpolator());
+        //ImageView image= (ImageView) findViewById(R.id.iv_icons);
+        //image.startAnimation(rotate);
+        //container = findViewById(R.id.iv_icons);
 
-        image.startAnimation(rotate);
+        //New Splash
+        container = findViewById(R.id.animation);
+        container.setImageResource(R.drawable.splash_animation);
+
+        animationDrawable = (AnimationDrawable) container.getDrawable();
+
         startResourceCopyProcess();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        animationDrawable.start();
     }
 
     private void startResourceCopyProcess(){
