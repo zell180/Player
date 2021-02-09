@@ -1,17 +1,23 @@
 package com.kingseiya.ilmito;
 
+import android.Manifest;
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.graphics.drawable.AnimationDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.animation.Animation;
-import android.view.animation.LinearInterpolator;
-import android.view.animation.RotateAnimation;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.LinearLayoutCompat;
+import androidx.core.content.ContextCompat;
 import com.kingseiya.ilmito.player.AssetUtils;
 import java.io.File;
 import java.io.IOException;
@@ -29,30 +35,71 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.splash_animated_activity);
 
-        // Saint Rotation
-        //setContentView(R.layout.splashscreen_activity);
-        //RotateAnimation rotate = new RotateAnimation(0, 360, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-        //rotate.setDuration(10000);
-        //rotate.setRepeatCount(Animation.INFINITE);
-        //rotate.setRepeatMode(Animation.RESTART);
-        //rotate.setInterpolator(new LinearInterpolator());
-        //ImageView image= (ImageView) findViewById(R.id.iv_icons);
-        //image.startAnimation(rotate);
-        //container = findViewById(R.id.iv_icons);
-
-        //New Splash
         container = findViewById(R.id.animation);
         container.setImageResource(R.drawable.splash_animation);
-
         animationDrawable = (AnimationDrawable) container.getDrawable();
+        if (getPermissionAnswer() == 99) {
+            AssetUtils.askForStoragePermission(SplashActivity.this);
+        } else {
+            if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == 0) {
+                startResourceCopyProcess();
+            } else {
+                createAlertDialog();
+            }
+        }
 
-        startResourceCopyProcess();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         animationDrawable.start();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        // Code necessary to track write permission
+        if (requestCode == PackageManager.PERMISSION_GRANTED && permissions[0].equals(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            try {
+                if (grantResults[0] == 0) {
+                    setPermissionAnswer(0);
+                    startResourceCopyProcess();
+                } else {
+                    setPermissionAnswer(-1);
+                    createAlertDialog();
+                }
+            } catch (PackageManager.NameNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void setPermissionAnswer(int value) throws PackageManager.NameNotFoundException {
+        SharedPreferences settings = getApplicationContext().getSharedPreferences("sharedPref", 0);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putInt("permissionAnswer", value);
+        editor.apply();
+    }
+
+    private int getPermissionAnswer() {
+        SharedPreferences settings = getApplicationContext().getSharedPreferences("sharedPref", 0);
+        return settings.getInt("permissionAnswer", 99);
+    }
+
+    private void createAlertDialog() {
+        Dialog alertDialog = new Dialog(this, R.style.AppTheme_NoActionBar_FullScreen_Transparent);
+        alertDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        alertDialog.setContentView(R.layout.alert_dialog);
+        alertDialog.setCancelable(false);
+        alertDialog.setCanceledOnTouchOutside(false);
+
+        //alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+        //alertDialog.getWindow().setBackgroundDrawableResource(R.color.colorAccent);
+        //alertDialog.getWindow().setLayout(LinearLayoutCompat.LayoutParams.MATCH_PARENT, LinearLayoutCompat.LayoutParams.MATCH_PARENT);
+        alertDialog.show();
+
+        Log.i("App", "Write permission denied");
     }
 
     private void startResourceCopyProcess(){
@@ -63,7 +110,6 @@ public class SplashActivity extends AppCompatActivity {
 
         @Override
         protected String doInBackground(String... params) {
-            AssetUtils.askForStoragePermission(SplashActivity.this);
             String dataDir = getApplication().getApplicationInfo().dataDir;
 
             // Standalone mode: Copy game in game folder to data folder and launch
@@ -145,5 +191,4 @@ public class SplashActivity extends AppCompatActivity {
             return settings.getInt("patchVersion", 000);
         }
     }
-    
 }

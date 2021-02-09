@@ -323,10 +323,10 @@ public class AssetUtils {
 				!= PackageManager.PERMISSION_GRANTED) {
 			ActivityCompat.requestPermissions(context,
 					new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PackageManager.PERMISSION_GRANTED);
-			int check = -1;
-			while (check != 0) {
-				check = ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE);;
-			}
+			//int check = -1;
+			//while (check != 0) {
+			//	check = ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+			//}
 		}
 	}
 }
