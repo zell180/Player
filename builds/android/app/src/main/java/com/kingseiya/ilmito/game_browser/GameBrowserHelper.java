@@ -261,7 +261,7 @@ public class GameBrowserHelper {
             intent.putExtra(EasyRpgPlayerActivity.TAG_COMMAND_LINE, args.toArray(new String[args.size()]));
             context.startActivity(intent);
         } else {
-            String msg = context.getString(R.string.not_valid_game).replace("$PATH", project.getTitle());
+            String msg = context.getString(R.string.broken_resources);
             Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
         }
     }

@@ -96,4 +96,5 @@ Please tell us in detail what went wrong.\n\n
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="menu">Open Android menu</string>
     <string name="wait_msg">Attendi un attimo, sta per avere inizio un\'avventura mitica...</string>
+    <string name="broken_resources">Qualcosa è andato storto durante l\'installazione. Reinstalla l\'app e attendi che Mur completi il suo lavoro</string>
 </resources>
