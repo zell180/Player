@@ -38,7 +38,8 @@ public class SplashActivity extends AppCompatActivity {
         container = findViewById(R.id.animation);
         container.setImageResource(R.drawable.splash_animation);
         animationDrawable = (AnimationDrawable) container.getDrawable();
-        if (getPermissionAnswer() == 99) {
+        if (getPermissionAnswer() == 99 &&
+                !(new File(getApplication().getApplicationInfo().dataDir + "/game").exists())) {
             AssetUtils.askForStoragePermission(SplashActivity.this);
         } else {
             if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == 0) {
