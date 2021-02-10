@@ -7,7 +7,7 @@
         <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.FullScreen">
+    <style name="AppTheme.NoActionBar.FullScreen" parent="Theme.AppCompat.NoActionBar">
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowActionBar">false</item>
         <item name="android:windowFullscreen">true</item>
@@ -17,7 +17,7 @@
         <item name="android:colorBackground">@color/design_default_color_on_secondary</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.FullScreen.Transparent">
+    <style name="AppTheme.NoActionBar.FullScreen.Transparent" parent="Theme.AppCompat.NoActionBar">
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowActionBar">false</item>
         <item name="android:windowFullscreen">true</item>
