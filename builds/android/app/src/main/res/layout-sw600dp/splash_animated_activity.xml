@@ -4,13 +4,14 @@
     android:id="@+id/anim_splash_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/design_default_color_on_secondary">
+    android:background="@color/design_default_color_on_secondary"
+    android:orientation="vertical">
 
     <ImageView
         android:id="@+id/animation"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="center_horizontal"
         android:adjustViewBounds="true"
         android:scaleType="centerCrop" />
 </LinearLayout>
