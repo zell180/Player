@@ -41,8 +41,8 @@ dependencies {
     implementation 'com.google.android.material:material:1.1.0'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
-    implementation project(path: ':zip_file')	
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'	
-    //implementation project(path: ':downloader_library')	
+    implementation project(path: ':zip_file')
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+    //implementation project(path: ':downloader_library')
     //implementation project(path: ':licensing_library')
 }
