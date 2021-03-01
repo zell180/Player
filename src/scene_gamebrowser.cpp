@@ -27,7 +27,7 @@
 #include "audio.h"
 
 #ifdef _WIN32
-	#include <Windows.h>
+	#include <windows.h>
 #endif
 
 namespace {
@@ -185,8 +185,8 @@ void Scene_GameBrowser::BootGame() {
 		browser_dir = Main_Data::GetProjectPath();
 	Main_Data::SetProjectPath(path);
 
-	std::shared_ptr<FileFinder::DirectoryTree> tree = FileFinder::CreateDirectoryTree(path);
-	FileFinder::SetDirectoryTree(tree);
+	auto tree = FileFinder::CreateDirectoryTree(path);
+	FileFinder::SetDirectoryTree(std::move(tree));
 
 	Player::CreateGameObjects();
 
