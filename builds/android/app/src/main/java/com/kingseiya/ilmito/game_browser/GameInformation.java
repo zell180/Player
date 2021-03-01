@@ -185,4 +185,3 @@ public class GameInformation implements Comparable<GameInformation> {
         return getTitle();
     }
 }
-
