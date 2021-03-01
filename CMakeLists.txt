@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.7)
-cmake_policy(SET CMP0091 NEW) # Support MSVC_RUNTIME_LIBRARY
+
+if(POLICY CMP0091)
+	cmake_policy(SET CMP0091 NEW) # Support MSVC_RUNTIME_LIBRARY
+endif()
 
 project(EasyRPG_Player VERSION 0.6.2 LANGUAGES CXX)
 
@@ -11,7 +14,7 @@ include(PlayerFindPackage)
 # C++14 is required
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_EXTENSIONS ON)
 
 # Must be at global scope, otherwise breaks -DPLAYER_BUILD_LIBLCF (see CMP0077)
 option(BUILD_SHARED_LIBS "Build shared easyrpg_libretro core" ON)
@@ -87,6 +90,8 @@ add_library(${PROJECT_NAME} STATIC
 	src/decoder_xmp.cpp
 	src/decoder_xmp.h
 	src/default_graphics.h
+	src/directory_tree.cpp
+	src/directory_tree.h
 	src/dirent_win.h
 	src/docmain.h
 	src/drawable.cpp
@@ -106,6 +111,8 @@ add_library(${PROJECT_NAME} STATIC
 	src/exfont.h
 	src/filefinder.cpp
 	src/filefinder.h
+	src/filefinder_rtp.cpp
+	src/filefinder_rtp.h
 	src/fileext_guesser.cpp
 	src/fileext_guesser.h
 	src/filesystem.cpp
@@ -433,6 +440,7 @@ endif()
 set(PLAYER_TARGET_PLATFORM "SDL2" CACHE STRING "Platform to compile for. Options: SDL2 libretro")
 set_property(CACHE PLAYER_TARGET_PLATFORM PROPERTY STRINGS SDL2 libretro)
 set(PLAYER_BUILD_EXECUTABLE ON)
+set(PLAYER_TEST_LIBRARIES ${PROJECT_NAME})
 
 if(${PLAYER_TARGET_PLATFORM} STREQUAL "SDL2")
 	target_sources(${PROJECT_NAME} PRIVATE
@@ -455,7 +463,6 @@ elseif(${PLAYER_TARGET_PLATFORM} STREQUAL "3ds")
 		src/platform/3ds/3ds_clock.h
 		src/platform/3ds/3ds_ui.cpp
 		src/platform/3ds/3ds_ui.h)
-	target_compile_definitions(${PROJECT_NAME} PUBLIC _3DS)
 elseif(${PLAYER_TARGET_PLATFORM} STREQUAL "psvita")
 	target_sources(${PROJECT_NAME} PRIVATE
 		src/platform/psvita/psp2_audio.cpp
@@ -464,7 +471,6 @@ elseif(${PLAYER_TARGET_PLATFORM} STREQUAL "psvita")
 		src/platform/psvita/psp2_clock.h
 		src/platform/psvita/psp2_ui.cpp
 		src/platform/psvita/psp2_ui.h)
-	target_compile_definitions(${PROJECT_NAME} PUBLIC PSP2)
 elseif(${PLAYER_TARGET_PLATFORM} STREQUAL "switch")
 	target_sources(${PROJECT_NAME} PRIVATE
 		src/platform/switch/switch_audio.cpp
@@ -473,15 +479,26 @@ elseif(${PLAYER_TARGET_PLATFORM} STREQUAL "switch")
 		src/platform/switch/switch_clock.h
 		src/platform/switch/switch_ui.cpp
 		src/platform/switch/switch_ui.h)
-	target_compile_definitions(${PROJECT_NAME} PUBLIC __SWITCH__)
 else()
 	message(FATAL_ERROR "Invalid target platform")
+endif()
+
+if(N3DS)
+	target_compile_definitions(${PROJECT_NAME} PUBLIC _3DS)
+elseif(VITA)
+	target_compile_definitions(${PROJECT_NAME} PUBLIC PSP2)
+elseif(NSWITCH)
+	target_compile_definitions(${PROJECT_NAME} PUBLIC __SWITCH__)
 endif()
 
 if(NOT PLAYER_BUILD_EXECUTABLE AND BUILD_SHARED_LIBS)
 	# Need fPIC when compiling a shared library (e.g. libretro.so)
 	set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 	set_property(TARGET ${PROJECT_NAME} PROPERTY POSITION_INDEPENDENT_CODE ON)
+endif()
+
+if(ANDROID)
+	target_link_libraries(${PROJECT_NAME} log)
 endif()
 
 if(WIN32)
@@ -847,11 +864,14 @@ else()
 		add_library(easyrpg_libretro
 			src/platform/libretro/libretro_audio.cpp
 			src/platform/libretro/libretro_audio.h
+			src/platform/libretro/libretro_clock.cpp
+			src/platform/libretro/libretro_clock.h
 			src/platform/libretro/libretro_input_buttons.cpp
 			src/platform/libretro/libretro_ui.cpp
 			src/platform/libretro/libretro_ui.h)
 		target_link_libraries(easyrpg_libretro ${PROJECT_NAME})
 		set_target_properties(easyrpg_libretro PROPERTIES PREFIX "")
+		set(PLAYER_TEST_LIBRARIES "easyrpg_libretro")
 	else()
 		message(FATAL_ERROR "Unsupported library target platform ${PLAYER_TARGET_PLATFORM}")
 	endif()
@@ -932,7 +952,7 @@ if(PLAYER_ENABLE_TESTS)
 		WIN32_EXECUTABLE FALSE
 	)
 	target_compile_definitions(test_runner_player PUBLIC EP_TEST_PATH=\"${CMAKE_CURRENT_SOURCE_DIR}/tests\")
-	target_link_libraries(test_runner_player ${PROJECT_NAME})
+	target_link_libraries(test_runner_player ${PLAYER_TEST_LIBRARIES})
 	add_custom_target(check_player COMMAND test_runner_player)
 	if(NOT TARGET check)
 		add_custom_target(check)

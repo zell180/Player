@@ -54,7 +54,7 @@ obj/
 
 # immediate files and libraries
 app/src/main/assets/timidity
-#app/src/main/jniLibs
+app/src/main/jniLibs
 
 # Keystore files
 *.jks

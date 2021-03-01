@@ -253,7 +253,7 @@ public class GameBrowserHelper {
 
             // Disable audio depending on user preferences
             if (!SettingsManager.isAudioEnabled()) {
-                // args.add("--disable-audio");
+                args.add("--disable-audio");
             }
 
             intent.putExtra(EasyRpgPlayerActivity.TAG_SAVE_PATH, project.getSavePath());
@@ -261,7 +261,7 @@ public class GameBrowserHelper {
             intent.putExtra(EasyRpgPlayerActivity.TAG_COMMAND_LINE, args.toArray(new String[args.size()]));
             context.startActivity(intent);
         } else {
-            String msg = context.getString(R.string.broken_resources);
+            String msg = context.getString(R.string.not_valid_game).replace("$PATH", project.getTitle());
             Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
         }
     }

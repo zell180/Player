@@ -288,11 +288,9 @@ public class ButtonMappingManager {
         public static LinkedList<VirtualButton> getDefaultButtonList(Context context) {
             LinkedList<VirtualButton> l = new LinkedList<VirtualButton>();
             l.add(new VirtualCross(context, 0.0, 0.5, 100));
-            l.add(VirtualButton.Create(context, VirtualButton.ENTER, 0.80, 0.75, 100));
+            l.add(VirtualButton.Create(context, VirtualButton.ENTER, 0.80, 0.7, 100));
             l.add(VirtualButton.Create(context, VirtualButton.CANCEL, 0.90, 0.6, 100));
-            l.add(VirtualButton.Create(context, VirtualButton.SHIFT, 0.80, 0.45, 100));
             l.add(new MenuButton(context, 0, 0, 90));
-            l.add(new FastForwardingButton(context, VirtualButton.KEY_FAST_FORWARD, 0.90, 0, 90));
 
             return l;
         }

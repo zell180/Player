@@ -25,7 +25,6 @@
 package com.kingseiya.ilmito.player;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,19 +34,9 @@ import java.util.zip.ZipEntry;
 import java.io.BufferedInputStream;
 import java.util.Arrays;
 
-import android.Manifest;
-import android.app.Activity;
-import android.content.Context;
-import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.os.Environment;
 import android.util.Log;
-
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
-import com.android.vending.expansion.zipfile.APKExpansionSupport;
-import com.android.vending.expansion.zipfile.ZipResourceFile;
 
 // based on https://stackoverflow.com/q/15574983/
 
@@ -82,7 +71,7 @@ public class AssetUtils {
 					String targetFile = folder.getAbsolutePath() + "/" + filename;
 					try {
 						in = assetManager.open(sourceFile);
-						out = new FileOutputStream(targetFile, false);
+						out = new FileOutputStream(targetFile);
 						/*Log.i("WEBVIEW",
 								Environment.getExternalStorageDirectory()
 										+ "/yourTargetFolder/" + name + "/"
@@ -141,7 +130,7 @@ public class AssetUtils {
 						continue;
 					}
 
-					FileOutputStream fout = new FileOutputStream(target + "/" + filename, false);
+					FileOutputStream fout = new FileOutputStream(target + "/" + filename);
 					copyFile(zis, fout);
 					fout.flush();
 					fout.close();
@@ -165,128 +154,6 @@ public class AssetUtils {
 		}
 	}
 
-	//Method used to copy file from APK Expansion Files
-	public static void copyFolderFromExpansion(Context appContext, String target,
-											   int mainVersion,
-											   int patchVersion,
-											   boolean update) throws IOException {
-		// "Name" is the name of your folder!
-		String[] files = null;
-		String state = Environment.getExternalStorageState();
-		ZipResourceFile expansionFile = null;
-		if (!update) {
-			expansionFile = new ZipResourceFile(Environment.getExternalStorageDirectory().getAbsolutePath() +
-															"/Android/obb/" +
-															appContext.getPackageName() +
-															"/main." +
-															mainVersion +
-															"." + appContext.getPackageName() +
-															".obb");
-		} else {
-			expansionFile = new ZipResourceFile(Environment.getExternalStorageDirectory().getAbsolutePath() +
-															"/Android/obb/" +
-															appContext.getPackageName() +
-															"/patch." +
-															patchVersion +
-															"." + appContext.getPackageName() +
-															".obb");
-		}
-
-		ZipResourceFile.ZipEntryRO[] zipFiles = expansionFile.getAllEntries();
-
-		if (Environment.MEDIA_MOUNTED.equals(state)) {
-			// We can read and write the media
-
-			// Analyzing all file on assets subfolder
-			for (ZipResourceFile.ZipEntryRO file: zipFiles) {
-				String pathInsideZip = file.mFileName;
-				String fileName = file.mFileName.substring(pathInsideZip.lastIndexOf("/"));
-				if (!fileName.equals("/")) {
-					String filePath = pathInsideZip.replace(fileName,"");
-					InputStream in = null;
-					OutputStream out = null;
-					// First: checking if there is already a target folder
-					File folder = new File(target + filePath);
-					boolean success = true;
-					if (!folder.exists()) {
-						success = folder.mkdirs();
-					}
-					if (success) {
-						// Moving all the files on external SD
-						//String sourceFile = source + "/" + filename;
-						String targetFile = folder.getAbsolutePath() + fileName;
-						try {
-							in = expansionFile.getInputStream(pathInsideZip);
-							out = new FileOutputStream(targetFile, false);
-							copyFile(in, out);
-							in.close();
-							in = null;
-							out.flush();
-							out.close();
-							out = null;
-						} catch (IOException e) {
-							Log.e("ERROR","Failed to copy asset file: " + targetFile, e);
-						}
-					} else {
-						// Do something else on failure
-					}
-				}
-			}
-		} else if (Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
-			// We can only read the media
-		} else {
-			// Something else is wrong. It may be one of many other states, but
-			// all we need
-			// is to know is we can neither read nor write
-		}
-	}
-
-	//Not necessary if modify save_path value in GameInformation
-	public static void copySaveFromExternal(Context appContext, String target) throws IOException {
-		String source = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" +
-						appContext.getPackageName().substring(appContext.getPackageName().lastIndexOf("."))
-						.replace(".","");
-		String state = Environment.getExternalStorageState();
-
-		if (Environment.MEDIA_MOUNTED.equals(state)) {
-			// We can read and write the media
-			// Analyzing all file on assets subfolder
-			File saveFolder = new File(source);
-			if (saveFolder.exists()) {
-				InputStream in = null;
-				OutputStream out = null;
-				String [] files = saveFolder.list();
-				if (files != null) {
-					for (String filename: files) {
-						if (filename.startsWith("Save")) {
-							String sourceFile = source + "/" + filename;
-							String targetFile = new File(target).getAbsolutePath() + "/" + filename;
-							try {
-								in = new FileInputStream(sourceFile);
-								out = new FileOutputStream(targetFile, false);
-								copyFile(in, out);
-								in.close();
-								in = null;
-								out.flush();
-								out.close();
-								out = null;
-							} catch (IOException e) {
-								Log.e("ERROR","Failed to copy save file: " + targetFile, e);
-							}
-						}
-					}
-				}
-			} else {
-					// Do something else on failure
-			}
-		} else if (Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
-			// We can only read the media
-		} else {
-			// Something else is wrong. It may be one of many other states, but
-			// all we need
-			// is to know is we can neither read nor write
-		}
-	}
 
 	// Method used by copyAssets() on purpose to copy a file.
 	private static void copyFile(InputStream in, OutputStream out) throws IOException {
@@ -315,18 +182,6 @@ public class AssetUtils {
 			return Arrays.asList(assetManager.list("")).contains(filename);
 		} catch (IOException e) {
 			return false;
-		}
-	}
-
-	public static void askForStoragePermission(Activity context) {
-		if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-				!= PackageManager.PERMISSION_GRANTED) {
-			ActivityCompat.requestPermissions(context,
-					new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PackageManager.PERMISSION_GRANTED);
-			//int check = -1;
-			//while (check != 0) {
-			//	check = ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-			//}
 		}
 	}
 }

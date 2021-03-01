@@ -2,8 +2,6 @@ package com.kingseiya.ilmito;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,7 +13,6 @@ import com.kingseiya.ilmito.player.AssetUtils;
 import com.kingseiya.ilmito.settings.SettingsManager;
 
 import java.io.File;
-import java.io.IOException;
 
 /**
  * The activity called at launch.
@@ -24,21 +21,15 @@ import java.io.IOException;
  * ("game" is the project directory, no sub folder)
  */
 public class MainActivity extends Activity {
-    private boolean standaloneMode = Versioner.getInstance().isStandaloneMode();
-    private int mainVersion = Versioner.getInstance().getMainVersion();
-    private int patchVersion = Versioner.getInstance().getPatchVersion();
+    private boolean standaloneMode = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //prepareData();
+        prepareData();
 
         // if the app is called in a game folder : start the game
-        try {
-            startGameStandaloneWithExpansion();
-        } catch (PackageManager.NameNotFoundException | IOException e) {
-            e.printStackTrace();
-        }
+        startGameStandalone();
 
         // else : launch the gamebrowser activity
         if (!standaloneMode) {
@@ -58,21 +49,6 @@ public class MainActivity extends Activity {
             if (!(new File(dataDir + "/timidity").exists())) {
                 AssetUtils.copyFolder(assetManager, "timidity", dataDir + "/timidity");
             }
-        }
-    }
-
-    /**
-     * Standalone Mode-> if there is a game folder in assets: that folder is
-     * copied to internal memory and executed.
-     */
-    private void startGameStandaloneWithExpansion() throws PackageManager.NameNotFoundException, IOException {
-        String dataDir = getApplication().getApplicationInfo().dataDir;
-
-        if (standaloneMode) {
-            // Launch the game
-            GameInformation project = new GameInformation(getApplicationContext(),dataDir + "/game");
-            GameBrowserHelper.launchGame(this, project);
-            finish();
         }
     }
 
@@ -130,5 +106,4 @@ public class MainActivity extends Activity {
         intent = new Intent(this, GameBrowserActivity.class);
         startActivity(intent);
     }
-
 }

@@ -2,8 +2,8 @@
 <manifest package="com.kingseiya.ilmito"
           xmlns:android="http://schemas.android.com/apk/res/android"
           android:installLocation="auto"
-          android:versionCode="142"
-          android:versionName="1.4.2">
+          android:versionCode="100"
+          android:versionName="1.0.0">
 
     <!-- OpenGL ES 2.0 -->
     <uses-feature android:glEsVersion="0x00020000"/>
@@ -13,14 +13,6 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.VIBRATE"/>
 
-    <!-- Permissions for obb download
-    <uses-permission android:name="com.android.vending.CHECK_LICENSE" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
-    -->
-
     <application
         android:allowBackup="true"
         android:requestLegacyExternalStorage="true"
@@ -28,26 +20,16 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
 
-        <!-- Obb download service
-        <service android:name=".ext_downloader.ExtDownloaderService" />
-        <receiver android:name=".ext_downloader.ExtAlarmReceiver" />
-        -->
-
-        <!-- Splash Activity -->
-        <activity android:name=".SplashActivity"
-            android:theme="@style/AppTheme.NoActionBar.FullScreen">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-
         <!-- Startup Activity -->
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
             android:noHistory="true"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
         </activity>
 
         <!-- GameBrowsers' Activity -->
@@ -116,9 +98,5 @@
             android:configChanges="orientation"
             android:label="@string/app_name"
             android:screenOrientation="landscape"/>
-
-        <meta-data
-            android:name="preloaded_fonts"
-            android:resource="@array/preloaded_fonts" />
     </application>
 </manifest>
