@@ -120,33 +120,23 @@ public class SplashActivity extends AppCompatActivity {
             // Copy game in internal memory
             if (!(new File(dataDir + "/game").exists())) {
                 try {
-                    AssetUtils.copyFolderFromExpansion(getApplicationContext(), dataDir + "/",
-                            mainVersion, patchVersion, false);
-                    setMainVersion();
-                    AssetUtils.copyFolderFromExpansion(getApplicationContext(), dataDir + "/",
-                            mainVersion, patchVersion, true);
-                    setPatchVersion();
+                    manageMainAsset(dataDir);
+                    managePatchAsset(dataDir);
                 } catch (IOException | PackageManager.NameNotFoundException e) {
                     e.printStackTrace();
                 }
             } else {
                 if (mainVersion > getMainVersion()) {
                     try {
-                        AssetUtils.copyFolderFromExpansion(getApplicationContext(), dataDir + "/",
-                                mainVersion, patchVersion, false);
-                        AssetUtils.copyFolderFromExpansion(getApplicationContext(), dataDir + "/",
-                                mainVersion, patchVersion, true);
-                        setMainVersion();
-                        setPatchVersion();
+                        manageMainAsset(dataDir);
+                        managePatchAsset(dataDir);
                     } catch (IOException | PackageManager.NameNotFoundException e) {
                         e.printStackTrace();
                     }
                 }
                 if (patchVersion > getPatchVersion()) {
                     try {
-                        AssetUtils.copyFolderFromExpansion(getApplicationContext(), dataDir + "/",
-                                mainVersion, patchVersion, true);
-                        setPatchVersion();
+                        managePatchAsset(dataDir);
                     } catch (IOException | PackageManager.NameNotFoundException e) {
                         e.printStackTrace();
                     }
@@ -167,6 +157,20 @@ public class SplashActivity extends AppCompatActivity {
 
         @Override
         protected void onProgressUpdate(Void... values) {}
+
+        private void manageMainAsset(String dataDir) throws IOException, PackageManager.NameNotFoundException {
+            AssetUtils.copyFolderFromExpansion(getApplicationContext(), dataDir + "/",
+                    mainVersion, patchVersion, false);
+            setMainVersion();
+            AssetUtils.removeExpansion(getApplicationContext(), mainVersion, patchVersion, false);
+        }
+
+        private void managePatchAsset(String dataDir) throws IOException, PackageManager.NameNotFoundException {
+            AssetUtils.copyFolderFromExpansion(getApplicationContext(), dataDir + "/",
+                    mainVersion, patchVersion, true);
+            setPatchVersion();
+            AssetUtils.removeExpansion(getApplicationContext(), mainVersion, patchVersion, true);
+        }
 
         private void setMainVersion() throws PackageManager.NameNotFoundException {
             SharedPreferences settings = getApplicationContext().getSharedPreferences("sharedPref", 0);

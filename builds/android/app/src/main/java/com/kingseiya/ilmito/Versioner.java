@@ -5,7 +5,7 @@ public class Versioner {
     private static Versioner instance = null;
     private boolean standaloneMode = true;
     private int mainVersion = 120;
-    private int patchVersion = 143;
+    private int patchVersion = 142;
 
     private Versioner() {}
 

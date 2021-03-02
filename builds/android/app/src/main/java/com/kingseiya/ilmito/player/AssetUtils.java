@@ -174,6 +174,7 @@ public class AssetUtils {
 		String[] files = null;
 		String state = Environment.getExternalStorageState();
 		ZipResourceFile expansionFile = null;
+
 		if (!update) {
 			expansionFile = new ZipResourceFile(Environment.getExternalStorageDirectory().getAbsolutePath() +
 															"/Android/obb/" +
@@ -232,6 +233,7 @@ public class AssetUtils {
 					}
 				}
 			}
+
 		} else if (Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
 			// We can only read the media
 		} else {
@@ -328,5 +330,29 @@ public class AssetUtils {
 			//	check = ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE);
 			//}
 		}
+	}
+
+	public static void removeExpansion(Context appContext, int mainVersion, int patchVersion,
+									   											boolean update) {
+		// Rimuove i file .obb se l'installazione va a buon fine
+		File fileToDelete = null;
+		if (!update) {
+			fileToDelete = new File(Environment.getExternalStorageDirectory().getAbsolutePath() +
+					"/Android/obb/" +
+					appContext.getPackageName() +
+					"/main." +
+					mainVersion +
+					"." + appContext.getPackageName() +
+					".obb");
+		} else {
+			fileToDelete = new File(Environment.getExternalStorageDirectory().getAbsolutePath() +
+					"/Android/obb/" +
+					appContext.getPackageName() +
+					"/patch." +
+					patchVersion +
+					"." + appContext.getPackageName() +
+					".obb");
+		}
+		fileToDelete.delete();
 	}
 }
