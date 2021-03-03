@@ -23,9 +23,6 @@ import java.io.File;
 import java.io.IOException;
 
 public class SplashActivity extends AppCompatActivity {
-    private boolean standaloneMode = Versioner.getInstance().isStandaloneMode();
-    private int mainVersion = Versioner.getInstance().getMainVersion();
-    private int patchVersion = Versioner.getInstance().getPatchVersion();
 
     private ImageView container;
     private AnimationDrawable animationDrawable;
@@ -34,10 +31,12 @@ public class SplashActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.splash_animated_activity);
-
         container = findViewById(R.id.animation);
-        container.setImageResource(R.drawable.splash_animation);
-        animationDrawable = (AnimationDrawable) container.getDrawable();
+        if (animationCheck()) {
+            container.setImageResource(R.drawable.splash_animation);
+            animationDrawable = (AnimationDrawable) container.getDrawable();
+        }
+
         if (getPermissionAnswer() == 99 &&
                 !(new File(getApplication().getApplicationInfo().dataDir + "/game").exists())) {
             AssetUtils.askForStoragePermission(SplashActivity.this);
@@ -51,10 +50,17 @@ public class SplashActivity extends AppCompatActivity {
 
     }
 
+    private boolean animationCheck() {
+        return Versioner.checkMainVersion(getApplicationContext()) ||
+                Versioner.checkPatchVersion(getApplicationContext());
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
-        animationDrawable.start();
+        if (animationCheck()) {
+            animationDrawable.start();
+        }
     }
 
     @Override
@@ -94,7 +100,6 @@ public class SplashActivity extends AppCompatActivity {
         alertDialog.setContentView(R.layout.alert_dialog);
         alertDialog.setCancelable(false);
         alertDialog.setCanceledOnTouchOutside(false);
-
         //alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
         //alertDialog.getWindow().setBackgroundDrawableResource(R.color.colorAccent);
         //alertDialog.getWindow().setLayout(LinearLayoutCompat.LayoutParams.MATCH_PARENT, LinearLayoutCompat.LayoutParams.MATCH_PARENT);
@@ -126,7 +131,7 @@ public class SplashActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
             } else {
-                if (mainVersion > getMainVersion()) {
+                if (Versioner.checkMainVersion(getApplicationContext())) {
                     try {
                         manageMainAsset(dataDir);
                         managePatchAsset(dataDir);
@@ -134,7 +139,7 @@ public class SplashActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 }
-                if (patchVersion > getPatchVersion()) {
+                if (Versioner.checkPatchVersion(getApplicationContext())) {
                     try {
                         managePatchAsset(dataDir);
                     } catch (IOException | PackageManager.NameNotFoundException e) {
@@ -160,40 +165,26 @@ public class SplashActivity extends AppCompatActivity {
 
         private void manageMainAsset(String dataDir) throws IOException, PackageManager.NameNotFoundException {
             AssetUtils.copyFolderFromExpansion(getApplicationContext(), dataDir + "/",
-                    mainVersion, patchVersion, false);
-            setMainVersion();
-            AssetUtils.removeExpansion(getApplicationContext(), mainVersion, patchVersion, false);
+                                                                    Versioner.getMainVersion(),
+                                                                    Versioner.getPatchVersion(),
+                                                                false);
+            Versioner.setCurrentMainVersion(getApplicationContext());
+            AssetUtils.removeExpansion(getApplicationContext(),
+                                        Versioner.getMainVersion(),
+                                        Versioner.getPatchVersion(),
+                                        false);
         }
 
         private void managePatchAsset(String dataDir) throws IOException, PackageManager.NameNotFoundException {
             AssetUtils.copyFolderFromExpansion(getApplicationContext(), dataDir + "/",
-                    mainVersion, patchVersion, true);
-            setPatchVersion();
-            AssetUtils.removeExpansion(getApplicationContext(), mainVersion, patchVersion, true);
-        }
-
-        private void setMainVersion() throws PackageManager.NameNotFoundException {
-            SharedPreferences settings = getApplicationContext().getSharedPreferences("sharedPref", 0);
-            SharedPreferences.Editor editor = settings.edit();
-            editor.putInt("mainVersion", mainVersion);
-            editor.apply();
-        }
-
-        private int getMainVersion() {
-            SharedPreferences settings = getApplicationContext().getSharedPreferences("sharedPref", 0);
-            return settings.getInt("mainVersion", 000);
-        }
-
-        private void setPatchVersion() throws PackageManager.NameNotFoundException {
-            SharedPreferences settings = getApplicationContext().getSharedPreferences("sharedPref", 0);
-            SharedPreferences.Editor editor = settings.edit();
-            editor.putInt("patchVersion", patchVersion);
-            editor.apply();
-        }
-
-        private int getPatchVersion() {
-            SharedPreferences settings = getApplicationContext().getSharedPreferences("sharedPref", 0);
-            return settings.getInt("patchVersion", 000);
+                                                                    Versioner.getMainVersion(),
+                                                                    Versioner.getPatchVersion(),
+                                                                true);
+            Versioner.setCurrentPatchVersion(getApplicationContext());
+            AssetUtils.removeExpansion(getApplicationContext(),
+                                        Versioner.getMainVersion(),
+                                        Versioner.getPatchVersion(),
+                                    true);
         }
     }
 }
