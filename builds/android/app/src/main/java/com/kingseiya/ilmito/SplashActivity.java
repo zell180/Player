@@ -6,32 +6,63 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.LinearGradient;
+import android.graphics.Shader;
 import android.graphics.drawable.AnimationDrawable;
-import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
+import android.view.View;
 import android.view.Window;
-import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.core.content.ContextCompat;
 import com.kingseiya.ilmito.player.AssetUtils;
+
 import java.io.File;
 import java.io.IOException;
 
 public class SplashActivity extends AppCompatActivity {
 
     private ImageView container;
+    private TextView install_textview;
     private AnimationDrawable animationDrawable;
+    private Handler progressHandler;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.splash_animated_activity);
         container = findViewById(R.id.animation);
+        install_textview = (TextView) findViewById(R.id.progress_text);
+        Shader gradient_msg_shader = new LinearGradient(
+                0, 0, 0, 100, Color.parseColor("#f3dfc2"), Color.parseColor("#734d22"), Shader.TileMode.REPEAT );
+        install_textview.getPaint().setShader(gradient_msg_shader);
+        progressHandler = new Handler(){
+            @Override
+            public void handleMessage(Message msg) {
+                if (msg.arg1 == 1) {
+                    ((TextView) findViewById(R.id.progress_text)).setVisibility(View.VISIBLE);
+                }
+
+                if (!(boolean) msg.obj) {
+                    ((TextView) findViewById(R.id.progress_text)).setText(getResources().getString(R.string.install_audio, msg.arg1, msg.arg2));
+                } else {
+                    ((TextView) findViewById(R.id.progress_text)).setText(getResources().getString(R.string.install_game_file, msg.arg1, msg.arg2));
+                }
+
+                if (msg.arg1 == msg.arg2) {
+                    ((TextView) findViewById(R.id.progress_text)).setVisibility(View.INVISIBLE);
+                }
+                super.handleMessage(msg);
+            }
+        };
         if (animationCheck()) {
             container.setImageResource(R.drawable.splash_animation);
             animationDrawable = (AnimationDrawable) container.getDrawable();
@@ -109,13 +140,25 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void startResourceCopyProcess(){
-        new ResourceOperation().execute("");
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+                new ResourceOperation(progressHandler).run();
+            }
+        };
+        thread.start();
     }
 
-    private class ResourceOperation extends AsyncTask<String, Void, String> {
+    private class ResourceOperation implements Runnable {
+
+        private final Handler progressHandler;
+
+        public ResourceOperation(Handler progressHandler) {
+            this.progressHandler = progressHandler;
+        }
 
         @Override
-        protected String doInBackground(String... params) {
+        public void run() {
             String dataDir = getApplication().getApplicationInfo().dataDir;
 
             // Standalone mode: Copy game in game folder to data folder and launch
@@ -125,63 +168,54 @@ public class SplashActivity extends AppCompatActivity {
             // Copy game in internal memory
             if (!(new File(dataDir + "/game").exists())) {
                 try {
-                    manageMainAsset(dataDir);
-                    managePatchAsset(dataDir);
+                    manageMainAsset(dataDir, install_textview);
+                    managePatchAsset(dataDir, install_textview);
                 } catch (IOException | PackageManager.NameNotFoundException e) {
                     e.printStackTrace();
                 }
             } else {
                 if (Versioner.checkMainVersion(getApplicationContext())) {
                     try {
-                        manageMainAsset(dataDir);
-                        managePatchAsset(dataDir);
+                        manageMainAsset(dataDir, install_textview);
+                        managePatchAsset(dataDir, install_textview);
                     } catch (IOException | PackageManager.NameNotFoundException e) {
                         e.printStackTrace();
                     }
                 }
                 if (Versioner.checkPatchVersion(getApplicationContext())) {
                     try {
-                        managePatchAsset(dataDir);
+                        managePatchAsset(dataDir, install_textview);
                     } catch (IOException | PackageManager.NameNotFoundException e) {
                         e.printStackTrace();
                     }
                 }
             }
-            return "Complete";
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
             Intent i = new Intent(SplashActivity.this, MainActivity.class);
             startActivity(i);
             finish();
         }
 
-        @Override
-        protected void onPreExecute() {}
-
-        @Override
-        protected void onProgressUpdate(Void... values) {}
-
-        private void manageMainAsset(String dataDir) throws IOException, PackageManager.NameNotFoundException {
-            AssetUtils.copyFolderFromExpansion(getApplicationContext(), dataDir + "/",
+        private void manageMainAsset(String dataDir, TextView install_textview) throws IOException, PackageManager.NameNotFoundException {
+            AssetUtils.copyFolderFromExpansion(SplashActivity.this, dataDir + "/",
+                                                                    progressHandler,
                                                                     Versioner.getMainVersion(),
                                                                     Versioner.getPatchVersion(),
                                                                 false);
-            Versioner.setCurrentMainVersion(getApplicationContext());
-            AssetUtils.removeExpansion(getApplicationContext(),
+            Versioner.setCurrentMainVersion(SplashActivity.this);
+            AssetUtils.removeExpansion(SplashActivity.this,
                                         Versioner.getMainVersion(),
                                         Versioner.getPatchVersion(),
                                         false);
         }
 
-        private void managePatchAsset(String dataDir) throws IOException, PackageManager.NameNotFoundException {
-            AssetUtils.copyFolderFromExpansion(getApplicationContext(), dataDir + "/",
+        private void managePatchAsset(String dataDir, TextView install_textview) throws IOException, PackageManager.NameNotFoundException {
+            AssetUtils.copyFolderFromExpansion(SplashActivity.this, dataDir + "/",
+                                                                    progressHandler,
                                                                     Versioner.getMainVersion(),
                                                                     Versioner.getPatchVersion(),
                                                                 true);
-            Versioner.setCurrentPatchVersion(getApplicationContext());
-            AssetUtils.removeExpansion(getApplicationContext(),
+            Versioner.setCurrentPatchVersion(SplashActivity.this);
+            AssetUtils.removeExpansion(SplashActivity.this,
                                         Versioner.getMainVersion(),
                                         Versioner.getPatchVersion(),
                                     true);

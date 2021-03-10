@@ -95,6 +95,8 @@ Please tell us in detail what went wrong.\n\n
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="menu">Open Android menu</string>
-    <string name="wait_msg">Attendi un attimo, sta per avere inizio un\'avventura mitica...</string>
-    <string name="broken_resources">Qualcosa è andato storto durante l\'installazione. Reinstalla l\'app e attendi che Mur completi il suo lavoro</string>
+    <string name="wait_msg">Wait a minute, a mythical adventure is about to begin...</string>
+    <string name="broken_resources">Something went wrong during the installation. Reinstall the app and wait for Mur to finish his job</string>
+    <string name="install_audio">INSTALLING AUDIO FILE: %1$d / %2$d</string>
+    <string name="install_game_file">INSTALLING GAME FILE: %1$d / %2$d</string>
 </resources>

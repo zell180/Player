@@ -41,13 +41,18 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.android.vending.expansion.zipfile.APKExpansionSupport;
 import com.android.vending.expansion.zipfile.ZipResourceFile;
+import com.kingseiya.ilmito.R;
 
 // based on https://stackoverflow.com/q/15574983/
 
@@ -167,6 +172,7 @@ public class AssetUtils {
 
 	//Method used to copy file from APK Expansion Files
 	public static void copyFolderFromExpansion(Context appContext, String target,
+											   Handler progressHandler,
 											   int mainVersion,
 											   int patchVersion,
 											   boolean update) throws IOException {
@@ -174,6 +180,7 @@ public class AssetUtils {
 		String[] files = null;
 		String state = Environment.getExternalStorageState();
 		ZipResourceFile expansionFile = null;
+		String text = appContext.getResources().getString(R.string.install_game_file, 2, 100);
 
 		if (!update) {
 			expansionFile = new ZipResourceFile(Environment.getExternalStorageDirectory().getAbsolutePath() +
@@ -197,9 +204,19 @@ public class AssetUtils {
 
 		if (Environment.MEDIA_MOUNTED.equals(state)) {
 			// We can read and write the media
+			((Activity) appContext).runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					System.out.println("PROVA");
+				}
+			});
+			int fileIdx = 0;
+			int zipSize = zipFiles.length;
 
 			// Analyzing all file on assets subfolder
 			for (ZipResourceFile.ZipEntryRO file: zipFiles) {
+				fileIdx += 1;
+				sendProgressMsg(progressHandler, fileIdx, zipSize, update);
 				String pathInsideZip = file.mFileName;
 				String fileName = file.mFileName.substring(pathInsideZip.lastIndexOf("/"));
 				if (!fileName.equals("/")) {
@@ -241,6 +258,14 @@ public class AssetUtils {
 			// all we need
 			// is to know is we can neither read nor write
 		}
+	}
+
+	private static void sendProgressMsg(Handler progressHandler, int fileIdx, int zipSize, boolean update) {
+		Message msg = progressHandler.obtainMessage();
+		msg.arg1 = fileIdx;
+		msg.arg2 = zipSize;
+		msg.obj = update;
+		progressHandler.sendMessage(msg);
 	}
 
 	//Not necessary if modify save_path value in GameInformation

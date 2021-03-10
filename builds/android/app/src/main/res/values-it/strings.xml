@@ -89,4 +89,8 @@ Per favore spiegaci in dettaglio in cosa consiste il bug.\n\n
   <string name="navigation_drawer_open">Apri menù di navigazione</string>
   <string name="navigation_drawer_close">Chiudi menù di navigazione</string>
   <string name="menu">Apri Menù Android</string>
+    <string name="broken_resources">Qualcosa è andato storto durante l\'installazione. Reinstalla l\'app e attendi che Mur completi il suo lavoro</string>
+  <string name="wait_msg">Attendi un attimo, sta per avere inizio un\'avventura mitica...</string>
+  <string name="install_audio">INSTALLANDO FILE AUDIO: %1$d / %2$d</string>
+  <string name="install_game_file">INSTALLANDO FILE DI GIOCO: %1$d / %2$d</string>
 </resources>
